@@ -1,0 +1,59 @@
+# note links are deprecated, so this is why there is no systematic use (because lazy)
+# see https://medium.com/@tristan.claverie/well-there-is-in-fact-a-simpler-solution-than-creating-a-network-do-nothing-at-all-docker-f38e93326134
+version: "2"
+services:
+  openbare_onderzoeken-urireferencer:
+    image: openbare_onderzoeken-dev/uriregistry:latest
+    ports:
+      - "6542:6543"
+  openbare_onderzoeken-rqworker:
+    image: openbare_onderzoeken-dev/openbare_onderzoeken:latest
+    links:
+     - openbare_onderzoeken-elastic:elastic
+     - openbare_onderzoeken-db:postgres
+     - openbare_onderzoeken-storage-provider:storageprovider
+     - openbare_onderzoeken-redis:redis
+    command: rqworker -u "http://redis:6379" openbare_onderzoeken
+  openbare_onderzoeken-elastic:
+    image: geosolutions/elasticsearch-plugins
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./data/elastic:/usr/share/elasticsearch/data
+  openbare_onderzoeken-db:
+    image: openbare_onderzoeken-dev/postgres:latest
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_USER=postgres"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  openbare_onderzoeken-storage-provider:
+    image: openbare_onderzoeken-dev/storageprovider:latest
+    ports:
+      - "6544:6544"
+    volumes:
+      - ./data/storageprovider:/openbare_onderzoeken_store
+  openbare_onderzoeken-redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  openbare_onderzoeken-app:
+    image: openbare_onderzoeken-dev/openbare_onderzoeken:latest
+    ports:
+     - "6543:6543"
+    volumes:
+     - ./openbare_onderzoeken/openbare_onderzoeken:/app/openbare_onderzoeken
+     - ./openbare_onderzoeken/alembic:/app/alembic
+     - ./openbare_onderzoeken/deploy:/app/deploy
+     - ./openbare_onderzoeken/tests:/app/tests
+     - ./openbare_onderzoeken/docs:/app/docs
+     - ./openbare_onderzoeken/alembic.ini:/app/alembic.ini
+     - ./openbare_onderzoeken/production.ini:/app/production.ini
+    links:
+     - openbare_onderzoeken-db:postgres
+     - openbare_onderzoeken-redis:redis
+     - openbare_onderzoeken-storage-provider:storageprovider
+     - openbare_onderzoeken-elastic:elastic
+     - openbare_onderzoeken-urireferencer:urireferencer

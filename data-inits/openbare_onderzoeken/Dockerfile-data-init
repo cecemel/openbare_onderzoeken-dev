@@ -1,0 +1,4 @@
+FROM openbare_onderzoeken-dev/openbare_onderzoeken:latest
+
+WORKDIR "/app"
+CMD ["sh", "-c", "initialize_openbare_onderzoeken_db development.ini#openbare_onderzoeken; initialize_openbare_onderzoeken_es development.ini#openbare_onderzoeken"]
