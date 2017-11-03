@@ -21,6 +21,7 @@ RUN pip install -e git+https://github.com/OnroerendErfgoed/oe_utils.git@0.14.0#e
 RUN pip install -e git+https://github.com/OnroerendErfgoed/crabpy_pyramid.git@0.6.1#egg=crabpy_pyramid
 RUN pip install -e git+https://github.com/OnroerendErfgoed/crabpy.git@0.8.2#egg=crabpy
 RUN pip install -e git+https://$GITUSER:$GITPW@github.com/OnroerendErfgoed/storageprovider-client.git@2.1.0#egg=storageprovider-client
+RUN pip install -e git+https://$GITUSER:$GITPW@github.com/OnroerendErfgoed/wsgicoers.git@0.8.2#egg=wsgicoers
 RUN pip install -r requirements.txt
 RUN pip install -r requirements-dev.txt
 COPY . /app
